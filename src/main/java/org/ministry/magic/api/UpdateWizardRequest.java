@@ -1,7 +1,6 @@
 package org.ministry.magic.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import org.ministry.magic.core.WandCore;
 
 public class UpdateWizardRequest {

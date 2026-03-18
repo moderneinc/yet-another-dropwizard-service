@@ -82,8 +82,12 @@ public class WizardResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Operation(summary = "Change a wizard's registration status")
     public WizardResponse updateStatus(@PathParam("id") UUID id, String newStatus) {
-        RegistrationStatus status = RegistrationStatus.valueOf(newStatus.trim().toUpperCase());
-        return WizardResponse.fromWizard(service.updateStatus(id, status));
+        try {
+            RegistrationStatus status = RegistrationStatus.valueOf(newStatus.trim().toUpperCase());
+            return WizardResponse.fromWizard(service.updateStatus(id, status));
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException("Invalid status: " + newStatus, Response.Status.BAD_REQUEST);
+        }
     }
 
     @DELETE

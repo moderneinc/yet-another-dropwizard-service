@@ -1,6 +1,7 @@
 package org.ministry.magic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.configuration.ConfigurationException;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.configuration.ConfigurationFactoryFactory;
 import io.dropwizard.configuration.DefaultConfigurationFactoryFactory;
@@ -11,6 +12,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +22,7 @@ class WizardRegistryConfigurationTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    void canDeserializeFromYaml() throws Exception {
+    void canDeserializeFromYaml() throws IOException, ConfigurationException {
         ConfigurationFactoryFactory<WizardRegistryConfiguration> factoryFactory =
                 new DefaultConfigurationFactoryFactory<>();
 

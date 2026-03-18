@@ -59,6 +59,7 @@ public class WizardRegistryApplication extends Application<WizardRegistryConfigu
     public void run(WizardRegistryConfiguration configuration, Environment environment) throws Exception {
         // Build managed data source from configuration
         final DataSourceFactory dataSourceFactory = configuration.getDataSourceFactory();
+        dataSourceFactory.setAutoCommitByDefault(false);
         final ManagedDataSource dataSource = dataSourceFactory.build(environment.metrics(), "wizard-db");
 
         // Register data source with lifecycle management
@@ -80,6 +81,12 @@ public class WizardRegistryApplication extends Application<WizardRegistryConfigu
         // Health checks
         environment.healthChecks().register("database", new DatabaseHealthCheck(dataSource));
         environment.healthChecks().register("wizard-registry", new WizardRegistryHealthCheck(wizardService));
+
+        // Make wizard service available via application context for servlet access
+        environment.getApplicationContext().setAttribute("wizardService", wizardService);
+
+        // Admin environment — enable admin servlet features
+        environment.admin();
 
         // Servlet filter — audit logging on all API calls
         environment.servlets()
