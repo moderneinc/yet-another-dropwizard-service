@@ -1,0 +1,39 @@
+ name: Copilot Setup Steps
+ 
+ on:
+   workflow_dispatch:
+   push:
+     paths:
+       - .github/workflows/copilot-setup-steps.yml
+   pull_request:
+     paths:
+       - .github/workflows/copilot-setup-steps.yml
+ 
+ jobs:
+   copilot-setup-steps:
+     runs-on: ubuntu-latest
+     permissions:
+       contents: read
+     steps:
+       - uses: actions/checkout@v5
+       - name: Install Moderne CLI
+         run: |
+           curl https://app.moderne.io/cli | bash
+           echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
+       - name: Activate Moderne CLI
+         run: |
+            mod config moderne edit https://app.moderne.io
+            mod config moderne login --with-token ${{ MODERNE_PLATFORM_PAT }}
+       - name: Install Agent tools
+         run: mod config agent-tools copilot install
+       - name: Install recipes
+         run:  |
+            mod config recipes jar install \
+              io.moderne.recipe:rewrite-spring \ 
+              org.openrewrite.recipe:rewrite-migrate-java \
+              org.openrewrite.recipe:rewrite-java-dependencies \ 
+              org.openrewrite:rewrite-java \
+              org.openrewrite:rewrite-maven \
+              io.moderne.recipe:rewrite-devcenter \
+              org.openrewrite.recipe:rewrite-spring \
+              org.openrewrite.recipe:rewrite-testing-frameworks
