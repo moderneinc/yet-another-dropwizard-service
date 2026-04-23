@@ -23,7 +23,7 @@
        - name: Activate Moderne CLI
          run: |
             mod config moderne edit https://app.moderne.io
-            mod config moderne login --with-token ${{ MODERNE_PLATFORM_PAT }}
+            mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
        - name: Install Agent tools
          run: mod config agent-tools copilot install
        - name: Install recipes
