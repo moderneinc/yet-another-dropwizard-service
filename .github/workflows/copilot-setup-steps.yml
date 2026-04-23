@@ -28,12 +28,4 @@
          run: mod config agent-tools copilot install
        - name: Install recipes
          run:  |
-            mod config recipes jar install \
-              io.moderne.recipe:rewrite-spring \ 
-              org.openrewrite.recipe:rewrite-migrate-java \
-              org.openrewrite.recipe:rewrite-java-dependencies \ 
-              org.openrewrite:rewrite-java \
-              org.openrewrite:rewrite-maven \
-              io.moderne.recipe:rewrite-devcenter \
-              org.openrewrite.recipe:rewrite-spring \
-              org.openrewrite.recipe:rewrite-testing-frameworks
+            mod config recipes jar install io.moderne.recipe:rewrite-spring org.openrewrite.recipe:rewrite-migrate-java org.openrewrite.recipe:rewrite-java-dependencies org.openrewrite:rewrite-java org.openrewrite:rewrite-maven org.openrewrite.recipe:rewrite-spring org.openrewrite.recipe:rewrite-testing-frameworks
