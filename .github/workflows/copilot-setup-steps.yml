@@ -20,11 +20,17 @@
          run: |
            curl https://app.moderne.io/cli | bash
            echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
+           mod --version
        - name: Activate Moderne CLI
          run: |
+            MODERNE_CLI_LICENSE_KEY
             mod config moderne edit https://app.moderne.io
             mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
+            mod config license edit ${{ secrets.MODERNE_CLI_LICENSE_KEY }}
+            mod config moderne show
        - name: Install Agent tools
          run: mod config agent-tools copilot install
        - name: Install recipes
-         run:  mod config recipes jar install io.moderne.recipe:rewrite-spring org.openrewrite.recipe:rewrite-migrate-java org.openrewrite.recipe:rewrite-java-dependencies org.openrewrite:rewrite-java org.openrewrite:rewrite-maven org.openrewrite.recipe:rewrite-spring org.openrewrite.recipe:rewrite-testing-frameworks
+         run:  |
+            mod config recipes moderne sync
+            mod config recipes list | head -20
