@@ -4,6 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.ministry.magic.api.CreateWizardRequest;
+import org.ministry.magic.api.UpdateWizardRequest;
+import org.ministry.magic.api.WizardResponse;
+import org.ministry.magic.core.RegistrationStatus;
+import org.ministry.magic.core.Wizard;
+import org.ministry.magic.service.WizardService;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -17,13 +24,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.ministry.magic.api.CreateWizardRequest;
-import org.ministry.magic.api.UpdateWizardRequest;
-import org.ministry.magic.api.WizardResponse;
-import org.ministry.magic.core.RegistrationStatus;
-import org.ministry.magic.core.Wizard;
-import org.ministry.magic.service.WizardService;
-
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
