@@ -2,6 +2,7 @@ package org.ministry.magic.service;
 
 import org.ministry.magic.api.CreateWizardRequest;
 import org.ministry.magic.api.UpdateWizardRequest;
+import org.ministry.magic.core.House;
 import org.ministry.magic.core.RegistrationStatus;
 import org.ministry.magic.core.Wizard;
 import org.ministry.magic.db.WizardDAO;
@@ -58,7 +59,7 @@ public class WizardService {
 
     public List<Wizard> findByHouse(String house) {
         try {
-            return dao.findByHouse(org.ministry.magic.core.House.valueOf(house.toUpperCase()));
+            return dao.findByHouse(House.valueOf(house.toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw new WebApplicationException("Invalid house: " + house, Response.Status.BAD_REQUEST);
         }

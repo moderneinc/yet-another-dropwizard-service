@@ -85,9 +85,6 @@ public class WizardRegistryApplication extends Application<WizardRegistryConfigu
         // Make wizard service available via application context for servlet access
         environment.getApplicationContext().setAttribute("wizardService", wizardService);
 
-        // Admin environment — enable admin servlet features
-        environment.admin();
-
         // Servlet filter — audit logging on all API calls
         environment.servlets()
                 .addFilter("AuditLogFilter", AuditLogFilter.class)

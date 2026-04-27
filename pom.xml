@@ -17,8 +17,8 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.release>11</maven.compiler.release>
-        <dropwizard.version>4.0.2</dropwizard.version>
-        <h2.version>2.2.224</h2.version>
+        <dropwizard.version>4.0.17</dropwizard.version>
+        <h2.version>2.4.240</h2.version>
         <mainClass>org.ministry.magic.WizardRegistryApplication</mainClass>
     </properties>
 

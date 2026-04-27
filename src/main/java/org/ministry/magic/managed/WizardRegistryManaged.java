@@ -29,7 +29,7 @@ public class WizardRegistryManaged implements Managed {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         log.info("Wizard Registry shutting down — Ministry of Magic offline");
     }
 
