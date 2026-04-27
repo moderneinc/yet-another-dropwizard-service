@@ -25,7 +25,7 @@
             mod --version
             mod config moderne edit https://app.moderne.io
             mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
-            mod config license edit ${{ secrets.MODERNE_CLI_LICENSE_KEY }}
+            mod config license edit ${{ secrets.MODERNE_LICENSE_KEY_ALTERNATIVE }}
             mod config moderne show
        - name: Install Agent tools
          run: mod config agent-tools copilot install
