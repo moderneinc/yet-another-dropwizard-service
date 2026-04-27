@@ -1,7 +1,7 @@
 package org.ministry.magic.core;
 
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class Wizard {
