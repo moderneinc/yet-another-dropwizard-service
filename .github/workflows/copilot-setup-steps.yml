@@ -31,5 +31,5 @@
          run: mod config agent-tools copilot install
        - name: Install recipes
          run:  |
-            mod config recipes moderne sync
+            mod config recipes jar install org.openrewrite.recipe:rewrite-static-analysis:LATEST org.openrewrite.recipe:rewrite-java-security:LATEST
             mod config recipes list | head -20
