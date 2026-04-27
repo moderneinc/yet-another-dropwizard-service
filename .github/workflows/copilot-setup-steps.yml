@@ -20,10 +20,9 @@
          run: |
            curl https://app.moderne.io/cli | bash
            echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
-           mod --version
        - name: Activate Moderne CLI
          run: |
-            MODERNE_CLI_LICENSE_KEY
+            mod --version
             mod config moderne edit https://app.moderne.io
             mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
             mod config license edit ${{ secrets.MODERNE_CLI_LICENSE_KEY }}
