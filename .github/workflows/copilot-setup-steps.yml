@@ -27,6 +27,8 @@
             mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
             mod config license edit ${{ secrets.MODERNE_LICENSE_KEY_ALTERNATIVE }}
             mod config moderne show
+            mod config http trust-store edit file /etc/ssl/certs/adoptium/cacerts
+            mod config recipes artifacts maven add https://repo.maven.apache.org/maven2
        - name: Install Agent tools
          run: mod config agent-tools copilot install
        - name: Install recipes
