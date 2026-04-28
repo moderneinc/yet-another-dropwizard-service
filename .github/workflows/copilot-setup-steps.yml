@@ -31,7 +31,8 @@
             mod config recipes artifacts maven add https://repo.maven.apache.org/maven2
        - name: Install Agent tools
          run: mod config agent-tools copilot install
-       - name: Install recipes
+       - name: Install recipes & build LST
          run:  |
+            mod build .
             mod config recipes jar install org.openrewrite.recipe:rewrite-static-analysis:LATEST org.openrewrite.recipe:rewrite-java-security:LATEST
             mod config recipes list | head -20
