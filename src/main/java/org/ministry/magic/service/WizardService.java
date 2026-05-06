@@ -130,7 +130,7 @@ public class WizardService {
             String msg = (String) event;
             return "Registry message: " + msg;
         } else if (event instanceof List) {
-            List list = (List) event;
+            List<?> list = (List<?>) event;
             return "Batch event: " + list.size() + " records";
         }
         return "Unknown event type";

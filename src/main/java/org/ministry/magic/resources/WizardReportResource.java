@@ -22,7 +22,13 @@ public class WizardReportResource {
     @Path("/{filename}")
     @Operation(summary = "Download a Ministry report by filename")
     public Response downloadReport(@PathParam("filename") String filename) throws IOException {
-        File reportFile = new File(REPORTS_BASE_DIR, filename);
+        File reportFile = new File(REPORTS_BASE_DIR, filename).getCanonicalFile();
+        File baseDir = new File(REPORTS_BASE_DIR).getCanonicalFile();
+        if (!reportFile.toPath().startsWith(baseDir.toPath())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Invalid filename")
+                    .build();
+        }
         if (!reportFile.exists() || !reportFile.isFile()) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("Report not found: " + filename)
