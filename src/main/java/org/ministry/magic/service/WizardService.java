@@ -121,4 +121,48 @@ public class WizardService {
     public long countActiveWizards() {
         return dao.countByStatus(RegistrationStatus.ACTIVE);
     }
+
+    public String describeRegistrationEvent(Object event) {
+        if (event instanceof Wizard) {
+            Wizard w = (Wizard) event;
+            return "Wizard registration: " + w.getFirstName() + " " + w.getLastName();
+        } else if (event instanceof String) {
+            String msg = (String) event;
+            return "Registry message: " + msg;
+        } else if (event instanceof List) {
+            List list = (List) event;
+            return "Batch event: " + list.size() + " records";
+        }
+        return "Unknown event type";
+    }
+
+    public String getHouseDescription(org.ministry.magic.core.House house) {
+        String description;
+        switch (house) {
+            case GRYFFINDOR:
+                description = "Brave at heart, dwell in nerve and chivalry";
+                break;
+            case HUFFLEPUFF:
+                description = "Just and loyal, patient and true";
+                break;
+            case RAVENCLAW:
+                description = "Wit beyond measure is man's greatest treasure";
+                break;
+            case SLYTHERIN:
+                description = "Cunning folk use any means to achieve their ends";
+                break;
+            default:
+                description = "Unaffiliated with a Hogwarts house";
+        }
+        return description;
+    }
+
+    public String buildWizardSummaryHtml(Wizard wizard) {
+        return "<div class=\"wizard-card\">\n" +
+               "  <h2>" + wizard.getFirstName() + " " + wizard.getLastName() + "</h2>\n" +
+               "  <p>House: <strong>" + wizard.getHouse() + "</strong></p>\n" +
+               "  <p>Status: <span class=\"status\">" + wizard.getStatus() + "</span></p>\n" +
+               "  <p>Patronus: " + wizard.getPatronus() + "</p>\n" +
+               "</div>";
+    }
 }

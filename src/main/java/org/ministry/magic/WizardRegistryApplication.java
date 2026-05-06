@@ -17,6 +17,8 @@ import org.ministry.magic.filter.AuditLogFilter;
 import org.ministry.magic.health.DatabaseHealthCheck;
 import org.ministry.magic.health.WizardRegistryHealthCheck;
 import org.ministry.magic.managed.WizardRegistryManaged;
+import org.ministry.magic.resources.WizardImportResource;
+import org.ministry.magic.resources.WizardReportResource;
 import org.ministry.magic.resources.WizardResource;
 import org.ministry.magic.service.WizardService;
 import org.ministry.magic.servlet.MinistryStatusServlet;
@@ -75,8 +77,10 @@ public class WizardRegistryApplication extends Application<WizardRegistryConfigu
         // Managed component — schema creation and data seeding
         environment.lifecycle().manage(new WizardRegistryManaged(dao));
 
-        // Register JAX-RS resource
+        // Register JAX-RS resources
         environment.jersey().register(new WizardResource(wizardService));
+        environment.jersey().register(new WizardImportResource(wizardService));
+        environment.jersey().register(new WizardReportResource());
 
         // Health checks
         environment.healthChecks().register("database", new DatabaseHealthCheck(dataSource));
