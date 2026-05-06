@@ -59,7 +59,7 @@ public class WizardService {
     public List<Wizard> findByHouse(String house) {
         try {
             return dao.findByHouse(org.ministry.magic.core.House.valueOf(house.toUpperCase()));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             throw new WebApplicationException("Invalid house: " + house, Response.Status.BAD_REQUEST);
         }
     }
@@ -67,7 +67,7 @@ public class WizardService {
     public List<Wizard> findByStatus(String status) {
         try {
             return dao.findByStatus(RegistrationStatus.valueOf(status.toUpperCase()));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             throw new WebApplicationException("Invalid status: " + status, Response.Status.BAD_REQUEST);
         }
     }
