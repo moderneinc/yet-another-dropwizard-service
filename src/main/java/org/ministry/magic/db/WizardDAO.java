@@ -106,10 +106,15 @@ public class WizardDAO {
     }
 
     public List<Wizard> searchByName(String query) {
-        String pattern = "%" + query.toLowerCase() + "%";
+        // Escape LIKE metacharacters so that '%' and '_' in user input are treated as literals
+        String escaped = query.toLowerCase()
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_");
+        String pattern = "%" + escaped + "%";
         return jdbi.withHandle(handle -> handle.createQuery(
-                "SELECT * FROM wizards WHERE LOWER(first_name) LIKE :pattern " +
-                "OR LOWER(last_name) LIKE :pattern " +
+                "SELECT * FROM wizards WHERE LOWER(first_name) LIKE :pattern ESCAPE '!' " +
+                "OR LOWER(last_name) LIKE :pattern ESCAPE '!' " +
                 "ORDER BY last_name, first_name")
                 .bind("pattern", pattern)
                 .map(mapper)
