@@ -25,7 +25,7 @@ import java.util.EnumSet;
 
 public class WizardRegistryApplication extends Application<WizardRegistryConfiguration> {
 
-    public void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         new WizardRegistryApplication().run(args);
     }
 
