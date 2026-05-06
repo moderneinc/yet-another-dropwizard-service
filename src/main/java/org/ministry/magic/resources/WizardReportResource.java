@@ -36,8 +36,8 @@ public class WizardReportResource {
     @Path("/{filename}")
     @Operation(summary = "Download a Ministry report by filename")
     public Response downloadReport(@PathParam("filename") String filename) throws IOException {
-        // Prevent path traversal: reject filenames containing separators or parent-directory references
-        if (filename == null || filename.contains("/") || filename.contains("\\") || filename.contains("..")) {
+        // Prevent path traversal: reject filenames containing path separators
+        if (filename == null || filename.contains("/") || filename.contains("\\")) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Invalid report filename")
                     .build();

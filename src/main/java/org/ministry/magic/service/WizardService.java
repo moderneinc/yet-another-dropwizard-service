@@ -160,20 +160,22 @@ public class WizardService {
     public String buildWizardSummaryHtml(Wizard wizard) {
         return "<div class=\"wizard-card\">\n" +
                "  <h2>" + escapeHtml(wizard.getFirstName()) + " " + escapeHtml(wizard.getLastName()) + "</h2>\n" +
-               "  <p>House: <strong>" + escapeHtml(String.valueOf(wizard.getHouse())) + "</strong></p>\n" +
-               "  <p>Status: <span class=\"status\">" + escapeHtml(String.valueOf(wizard.getStatus())) + "</span></p>\n" +
+               "  <p>House: <strong>" + escapeHtml(wizard.getHouse()) + "</strong></p>\n" +
+               "  <p>Status: <span class=\"status\">" + escapeHtml(wizard.getStatus()) + "</span></p>\n" +
                "  <p>Patronus: " + escapeHtml(wizard.getPatronus()) + "</p>\n" +
                "</div>";
     }
 
     /**
      * Escapes special HTML characters to prevent XSS vulnerabilities.
+     * Accepts any Object; null is rendered as an empty string.
      */
-    private static String escapeHtml(String value) {
+    private static String escapeHtml(Object value) {
         if (value == null) {
             return "";
         }
-        return value.replace("&", "&amp;")
+        return value.toString()
+                    .replace("&", "&amp;")
                     .replace("<", "&lt;")
                     .replace(">", "&gt;")
                     .replace("\"", "&quot;")
