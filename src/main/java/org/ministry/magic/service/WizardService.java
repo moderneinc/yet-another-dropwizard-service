@@ -130,7 +130,7 @@ public class WizardService {
             String msg = (String) event;
             return "Registry message: " + msg;
         } else if (event instanceof List) {
-            List list = (List) event;
+            List<?> list = (List<?>) event;
             return "Batch event: " + list.size() + " records";
         }
         return "Unknown event type";
@@ -159,10 +159,24 @@ public class WizardService {
 
     public String buildWizardSummaryHtml(Wizard wizard) {
         return "<div class=\"wizard-card\">\n" +
-               "  <h2>" + wizard.getFirstName() + " " + wizard.getLastName() + "</h2>\n" +
-               "  <p>House: <strong>" + wizard.getHouse() + "</strong></p>\n" +
-               "  <p>Status: <span class=\"status\">" + wizard.getStatus() + "</span></p>\n" +
-               "  <p>Patronus: " + wizard.getPatronus() + "</p>\n" +
+               "  <h2>" + escapeHtml(wizard.getFirstName()) + " " + escapeHtml(wizard.getLastName()) + "</h2>\n" +
+               "  <p>House: <strong>" + escapeHtml(String.valueOf(wizard.getHouse())) + "</strong></p>\n" +
+               "  <p>Status: <span class=\"status\">" + escapeHtml(String.valueOf(wizard.getStatus())) + "</span></p>\n" +
+               "  <p>Patronus: " + escapeHtml(wizard.getPatronus()) + "</p>\n" +
                "</div>";
+    }
+
+    /**
+     * Escapes special HTML characters to prevent XSS vulnerabilities.
+     */
+    private static String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#x27;");
     }
 }
