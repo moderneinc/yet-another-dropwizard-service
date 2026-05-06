@@ -106,11 +106,16 @@ public class WizardDAO {
     }
 
     public List<Wizard> searchByName(String query) {
-        // Escape LIKE metacharacters so that '%' and '_' in user input are treated as literals
+        // Escape LIKE metacharacters so that '%' and '_' in user input are treated as literals.
+        // IMPORTANT: '!' (the chosen escape character) MUST be escaped first. If '%' were
+        // escaped before '!', a literal '!' followed by a '%' would become '!!' + '!%' = '!!!%',
+        // which would incorrectly represent a literal '!' followed by a literal '%' only after
+        // double-processing. By escaping '!' → '!!' first, each subsequent replacement
+        // operates on already-safe content and cannot create unintended escape sequences.
         String escaped = query.toLowerCase()
-                .replace("!", "!!")
-                .replace("%", "!%")
-                .replace("_", "!_");
+                .replace("!", "!!")   // escape char itself — MUST come first
+                .replace("%", "!%")   // LIKE wildcard "zero or more chars"
+                .replace("_", "!_");  // LIKE wildcard "exactly one char"
         String pattern = "%" + escaped + "%";
         return jdbi.withHandle(handle -> handle.createQuery(
                 "SELECT * FROM wizards WHERE LOWER(first_name) LIKE :pattern ESCAPE '!' " +

@@ -40,7 +40,16 @@ public class WizardImportResource {
     public Response importWizards(String xmlPayload) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
+            // Disable DOCTYPE declarations entirely to prevent XXE injection (OWASP A05 / CWE-611).
+            // The 'disallow-doctype-decl' feature is the strongest single control and makes
+            // any XML with a DOCTYPE declaration throw a SAXParseException before parsing.
+            // The external-entity features below provide defence-in-depth for parsers that
+            // do not support 'disallow-doctype-decl'.
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("XML parser security configuration failed.", e);
         }

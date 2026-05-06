@@ -36,8 +36,13 @@ public class WizardReportResource {
     @Path("/{filename}")
     @Operation(summary = "Download a Ministry report by filename")
     public Response downloadReport(@PathParam("filename") String filename) throws IOException {
-        // Prevent path traversal: reject filenames containing path separators
-        if (filename == null || filename.contains("/") || filename.contains("\\")) {
+        // Prevent path traversal: reject filenames containing path separators or null bytes.
+        // The canonical-path containment check below is the primary defence; this early-exit
+        // catches the most obvious attack patterns before touching the filesystem.
+        if (filename == null
+                || filename.contains("/")
+                || filename.contains("\\")
+                || filename.contains("\0")) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Invalid report filename")
                     .build();
