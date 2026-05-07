@@ -1,12 +1,6 @@
 package org.ministry.magic.resources;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.ministry.magic.api.CreateWizardRequest;
 import org.ministry.magic.core.House;
 import org.ministry.magic.core.WandCore;
@@ -15,8 +9,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -38,6 +39,11 @@ public class WizardImportResource {
     @Operation(summary = "Bulk-import wizards from an XML payload")
     public Response importWizards(String xmlPayload) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("ParserConfigurationException was thrown. The feature 'disallow-doctype-decl' is not supported by your XML processor.", e);
+        }
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(new ByteArrayInputStream(xmlPayload.getBytes(StandardCharsets.UTF_8)));
 
