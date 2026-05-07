@@ -13,7 +13,6 @@
     <description>Ministry of Magic — Registered Wizards Management Service</description>
 
     <properties>
-        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <dropwizard.version>4.0.2</dropwizard.version>
