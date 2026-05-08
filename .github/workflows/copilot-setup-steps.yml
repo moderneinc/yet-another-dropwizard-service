@@ -16,6 +16,14 @@
        contents: read
      steps:
        - uses: actions/checkout@v5
+       - name: Set up JDK 25
+         uses: actions/setup-java@v4
+         with:
+           java-version: '25'
+           distribution: 'temurin'
+           cache: maven
+       - name: Build project to produce compiled classes
+         run: mvn compile --batch-mode -q
        - name: Install Moderne CLI
          run: |
            curl https://dev.moderne.io/cli | bash
