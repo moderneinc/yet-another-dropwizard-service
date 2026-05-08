@@ -18,7 +18,7 @@
        - uses: actions/checkout@v5
        - name: Install Moderne CLI
          run: |
-           curl https://app.moderne.io/cli | bash
+           curl https://dev.moderne.io/cli | bash
            echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
        - name: Activate Moderne CLI
          run: |
