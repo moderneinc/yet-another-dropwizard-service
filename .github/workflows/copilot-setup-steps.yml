@@ -29,7 +29,8 @@
             mod config moderne show
             mod config http trust-store edit file /etc/ssl/certs/adoptium/cacerts
             mod config recipes artifacts maven add https://repo.maven.apache.org/maven2
-       - name: Install recipes & build LST
+       - name: Install recipes and build LST
          run:  |
-            mod config recipes jar install org.openrewrite.recipe:rewrite-static-analysis:LATEST org.openrewrite.recipe:rewrite-java-security:LATEST
+            mod config recipes moderne sync
             mod config recipes list | head -20
+            mod build .
