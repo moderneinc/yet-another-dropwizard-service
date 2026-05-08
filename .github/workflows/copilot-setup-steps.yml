@@ -19,8 +19,9 @@
        - name: Install Moderne CLI
          run: |
            curl https://dev.moderne.io/cli | bash
+           echo "version=LATEST" > $HOME/.moderne/cli/dist/moderne-wrapper.properties
            echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
-       - name: Activate Moderne CLI
+       - name: Update and Activate Moderne CLI
          run: |
             mod --version
             mod config moderne edit https://app.moderne.io
