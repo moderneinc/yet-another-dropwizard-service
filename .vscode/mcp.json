@@ -3,7 +3,7 @@
     "moderne" : {
       "type" : "stdio",
       "command" : "bash",
-      "args" : [ "-c", "if [ -x '/home/runner/.moderne/cli/bin/mod' ]; then exec '/home/runner/.moderne/cli/bin/mod' mcp; else exec mod mcp; fi" ]
+      "args" : [ "-c", "if [ -x '/Users/merlin/.moderne/cli/bin/mod' ]; then exec '/Users/merlin/.moderne/cli/bin/mod' mcp; else exec mod mcp; fi" ]
     }
   }
 }
