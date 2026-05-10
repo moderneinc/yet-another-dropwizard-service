@@ -13,3 +13,6 @@ dependency-reduced-pom.xml
 .project
 .vscode/
 .github/instructions/
+.moderne/
+!.moderne/moderne.yml
+!.moderne/context/

@@ -34,4 +34,33 @@
          run:  |
             mod config recipes jar install io.moderne.recipe:rewrite-cryptography io.moderne.recipe:rewrite-dropwizard io.moderne.recipe:rewrite-elastic io.moderne.recipe:rewrite-hibernate io.moderne.recipe:rewrite-jasperreports io.moderne.recipe:rewrite-java-application-server io.moderne.recipe:rewrite-kafka io.moderne.recipe:rewrite-spring io.moderne.recipe:rewrite-tapestry io.moderne.recipe:rewrite-vulncheck org.openrewrite:rewrite-core org.openrewrite:rewrite-docker org.openrewrite:rewrite-gradle org.openrewrite:rewrite-groovy org.openrewrite:rewrite-hcl org.openrewrite:rewrite-java org.openrewrite:rewrite-json org.openrewrite:rewrite-maven org.openrewrite:rewrite-properties org.openrewrite:rewrite-protobuf org.openrewrite:rewrite-templating org.openrewrite:rewrite-toml org.openrewrite:rewrite-xml org.openrewrite:rewrite-yaml org.openrewrite.meta:rewrite-analysis org.openrewrite.recipe:rewrite-ai-search org.openrewrite.recipe:rewrite-all org.openrewrite.recipe:rewrite-apache org.openrewrite.recipe:rewrite-circleci org.openrewrite.recipe:rewrite-codemods org.openrewrite.recipe:rewrite-codemods-ng org.openrewrite.recipe:rewrite-compiled-analysis org.openrewrite.recipe:rewrite-concourse org.openrewrite.recipe:rewrite-cucumber-jvm org.openrewrite.recipe:rewrite-dotnet org.openrewrite.recipe:rewrite-feature-flags org.openrewrite.recipe:rewrite-github-actions org.openrewrite.recipe:rewrite-gitlab org.openrewrite.recipe:rewrite-hibernate org.openrewrite.recipe:rewrite-jackson org.openrewrite.recipe:rewrite-java-dependencies org.openrewrite.recipe:rewrite-java-security org.openrewrite.recipe:rewrite-jenkins org.openrewrite.recipe:rewrite-joda org.openrewrite.recipe:rewrite-kubernetes org.openrewrite.recipe:rewrite-liberty org.openrewrite.recipe:rewrite-logging-frameworks org.openrewrite.recipe:rewrite-micrometer org.openrewrite.recipe:rewrite-micronaut org.openrewrite.recipe:rewrite-migrate-java org.openrewrite.recipe:rewrite-migrate-kotlin org.openrewrite.recipe:rewrite-netty org.openrewrite.recipe:rewrite-okhttp org.openrewrite.recipe:rewrite-openapi org.openrewrite.recipe:rewrite-prethink org.openrewrite.recipe:rewrite-quarkus org.openrewrite.recipe:rewrite-reactive-streams org.openrewrite.recipe:rewrite-rewrite org.openrewrite.recipe:rewrite-spring org.openrewrite.recipe:rewrite-spring-to-quarkus org.openrewrite.recipe:rewrite-sql org.openrewrite.recipe:rewrite-static-analysis org.openrewrite.recipe:rewrite-struts org.openrewrite.recipe:rewrite-terraform org.openrewrite.recipe:rewrite-testing-frameworks org.openrewrite.recipe:rewrite-third-party
             mod config recipes list | head -20
+            mod config agent-tools copilot install
             mod build .
+            TRACE_JSON=$(ls .moderne/build/*/trace.json 2>/dev/null | head -1)
+            if [ -z "$TRACE_JSON" ]; then
+              echo "::error::No trace.json found after mod build — cannot verify LST health"
+              exit 1
+            fi
+            PARSE_ERRORS=$(python3 -c "import sys,json; d=json.load(open(sys.argv[1])); print(d['build']['parseErrorCount'])" "$TRACE_JSON")
+            if [ "$PARSE_ERRORS" -gt 0 ]; then
+              echo "::error::LST build has $PARSE_ERRORS parse errors — Tier-2 MCP tools will be unavailable"
+              exit 1
+            fi
+       - name: Pre-warm MCP LST
+         run: |
+            # Launch mod mcp in background and send a JSON-RPC initialization handshake so it
+            # builds and caches the LST index into .moderne/mcp/lst/. When the agent
+            # session later starts mod mcp it finds the cache valid and skips the rebuild,
+            # making all Tier-2 MCP tools (find_types, trigrep_search, run_recipe, …)
+            # available immediately.
+            printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"setup","version":"1.0"}}}\n' \
+              | timeout 120 mod mcp &
+            MCP_PID=$!
+            for attempt in $(seq 1 60); do
+              if [ -f .moderne/mcp/lst/cache-manifest.json ] && [ -d .moderne/mcp/lst/objects ]; then
+                echo "MCP LST cache is ready."
+                break
+              fi
+              sleep 2
+            done
+            kill $MCP_PID 2>/dev/null || true
