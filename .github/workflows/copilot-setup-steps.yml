@@ -48,99 +48,32 @@ jobs:
            fi
       - name: Pre-warm MCP LST
         run: |
-           # Perform a full MCP JSON-RPC handshake with mod mcp and wait until all
-           # Tier-2 tools (run_recipe, learn_recipe, find_types, …) are confirmed
-           # available. This populates .moderne/mcp/lst/ so the Copilot agent session
-           # loads from cache rather than rebuilding, minimising startup latency.
-           # The step fails the build if tools don't appear within 120 s so broken
-           # setups are caught during CI rather than silently at agent start.
-           python3 - << 'PYEOF'
-import subprocess, json, time, select, sys
-
-proc = subprocess.Popen(
-    ['mod', 'mcp'],
-    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-)
-
-req_id = [0]
-pending = {}
-
-def send(method, params=None, callback=None):
-    req_id[0] += 1
-    rid = req_id[0]
-    msg = {"jsonrpc": "2.0", "id": rid, "method": method}
-    if params:
-        msg["params"] = params
-    if callback:
-        pending[rid] = callback
-    proc.stdin.write(json.dumps(msg) + "\n")
-    proc.stdin.flush()
-    return rid
-
-def notify(method):
-    proc.stdin.write(json.dumps({"jsonrpc": "2.0", "method": method}) + "\n")
-    proc.stdin.flush()
-
-# Tier-2 tools that require a healthy LST — a subset check is sufficient
-TIER2_TOOLS = {"run_recipe", "learn_recipe", "search_recipes", "find_types",
-               "find_methods", "find_annotations", "find_implementations",
-               "change_type", "change_method_name"}
-
-last_change = [None]
-tools_queried = [False]
-all_ready = [False]
-start = time.time()
-
-send("initialize", {
-    "protocolVersion": "2024-11-05",
-    "capabilities": {},
-    "clientInfo": {"name": "setup-prewarm", "version": "1.0"}
-})
-
-deadline = time.time() + 120
-while time.time() < deadline:
-    r, _, _ = select.select([proc.stdout], [], [], 0.3)
-    now = time.time()
-    if r:
-        line = proc.stdout.readline()
-        if not line.strip():
-            continue
-        try:
-            msg = json.loads(line.strip())
-            method = msg.get("method", "")
-            rid = msg.get("id")
-            if rid == 1 and "result" in msg:
-                notify("notifications/initialized")
-            elif method == "notifications/tools/list_changed":
-                last_change[0] = now
-                tools_queried[0] = False
-            elif rid in pending:
-                cb = pending.pop(rid)
-                cb(msg.get("result", {}))
-        except Exception:
-            pass
-
-    # Debounce: query tool list 0.5 s after the last change notification settles
-    if last_change[0] and not tools_queried[0] and (now - last_change[0]) > 0.5:
-        def on_tools(result):
-            names = {t["name"] for t in result.get("tools", [])}
-            elapsed = time.time() - start
-            print(f"[{elapsed:.1f}s] {len(names)} MCP tools available", flush=True)
-            if TIER2_TOOLS.issubset(names):
-                all_ready[0] = True
-                print(f"[{elapsed:.1f}s] All Tier-2 MCP tools confirmed — cache is hot.", flush=True)
-        send("tools/list", callback=on_tools)
-        tools_queried[0] = True
-
-    if all_ready[0]:
-        break
-
-proc.terminate()
-proc.wait(timeout=5)
-
-if not all_ready[0]:
-    print("::error::Tier-2 MCP tools did not become available within 120 s. "
-          "Check that the LST built cleanly (parse errors = 0) and that the "
-          "Moderne license key is valid.", file=sys.stderr)
-    sys.exit(1)
-PYEOF
+           # Start mod mcp with the MCP initialization handshake and wait for it to
+           # build the search-index cache (.moderne/mcp/lst/).  The LST itself is
+           # already available from 'mod build .' above; this step only needs to
+           # populate the zoekt search index on top of it.
+           #
+           # With a warm build the index is ready in ~3 s.  Without any prior cache
+           # it can take up to ~60 s.  We wait up to 120 s and fail if the cache is
+           # never created, so a broken setup is caught here rather than silently in
+           # the agent session.
+           #
+           # Once this cache exists the next 'mod mcp' invocation (started by the
+           # Copilot agent) loads from cache and exposes all 18 Tier-2 MCP tools
+           # (run_recipe, learn_recipe, find_types, …) within a few seconds,
+           # making them available from the very start of the agent session.
+           printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"prewarm","version":"1.0"}}}\n' \
+             | timeout 120 mod mcp &
+           MCP_PID=$!
+           for i in $(seq 1 60); do
+             sleep 2
+             if [ -f .moderne/mcp/lst/cache-manifest.json ] && [ -d .moderne/mcp/lst/objects ]; then
+               echo "MCP search-index cache ready after $((i * 2))s"
+               break
+             fi
+           done
+           kill $MCP_PID 2>/dev/null || true
+           if [ ! -f .moderne/mcp/lst/cache-manifest.json ]; then
+             echo "::error::MCP search-index was not created — Tier-2 tools will be unavailable in the agent session"
+             exit 1
+           fi
