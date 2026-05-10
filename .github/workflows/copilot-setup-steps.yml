@@ -1,66 +1,146 @@
- name: Copilot Setup Steps
- 
- on:
-   workflow_dispatch:
-   push:
-     paths:
-       - .github/workflows/copilot-setup-steps.yml
-   pull_request:
-     paths:
-       - .github/workflows/copilot-setup-steps.yml
- 
- jobs:
-   copilot-setup-steps:
-     runs-on: ubuntu-latest
-     permissions:
-       contents: read
-     steps:
-       - uses: actions/checkout@v5
-       - name: Install Moderne CLI
-         run: |
-           curl https://dev.moderne.io/cli | bash
-           echo "version=LATEST" > $HOME/.moderne/cli/dist/moderne-wrapper.properties
-           echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
-       - name: Update and Activate Moderne CLI
-         run: |
-            mod --version
-            mod config moderne edit https://app.moderne.io
-            mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
-            mod config license edit ${{ secrets.MODERNE_LICENSE_KEY_ALTERNATIVE }}
-            mod config moderne show
-            mod config http trust-store edit file /etc/ssl/certs/adoptium/cacerts
-            mod config recipes artifacts maven add https://repo.maven.apache.org/maven2
-       - name: Install recipes and build
-         run:  |
-            mod config recipes jar install io.moderne.recipe:rewrite-cryptography io.moderne.recipe:rewrite-dropwizard io.moderne.recipe:rewrite-elastic io.moderne.recipe:rewrite-hibernate io.moderne.recipe:rewrite-jasperreports io.moderne.recipe:rewrite-java-application-server io.moderne.recipe:rewrite-kafka io.moderne.recipe:rewrite-spring io.moderne.recipe:rewrite-tapestry io.moderne.recipe:rewrite-vulncheck org.openrewrite:rewrite-core org.openrewrite:rewrite-docker org.openrewrite:rewrite-gradle org.openrewrite:rewrite-groovy org.openrewrite:rewrite-hcl org.openrewrite:rewrite-java org.openrewrite:rewrite-json org.openrewrite:rewrite-maven org.openrewrite:rewrite-properties org.openrewrite:rewrite-protobuf org.openrewrite:rewrite-templating org.openrewrite:rewrite-toml org.openrewrite:rewrite-xml org.openrewrite:rewrite-yaml org.openrewrite.meta:rewrite-analysis org.openrewrite.recipe:rewrite-ai-search org.openrewrite.recipe:rewrite-all org.openrewrite.recipe:rewrite-apache org.openrewrite.recipe:rewrite-circleci org.openrewrite.recipe:rewrite-codemods org.openrewrite.recipe:rewrite-codemods-ng org.openrewrite.recipe:rewrite-compiled-analysis org.openrewrite.recipe:rewrite-concourse org.openrewrite.recipe:rewrite-cucumber-jvm org.openrewrite.recipe:rewrite-dotnet org.openrewrite.recipe:rewrite-feature-flags org.openrewrite.recipe:rewrite-github-actions org.openrewrite.recipe:rewrite-gitlab org.openrewrite.recipe:rewrite-hibernate org.openrewrite.recipe:rewrite-jackson org.openrewrite.recipe:rewrite-java-dependencies org.openrewrite.recipe:rewrite-java-security org.openrewrite.recipe:rewrite-jenkins org.openrewrite.recipe:rewrite-joda org.openrewrite.recipe:rewrite-kubernetes org.openrewrite.recipe:rewrite-liberty org.openrewrite.recipe:rewrite-logging-frameworks org.openrewrite.recipe:rewrite-micrometer org.openrewrite.recipe:rewrite-micronaut org.openrewrite.recipe:rewrite-migrate-java org.openrewrite.recipe:rewrite-migrate-kotlin org.openrewrite.recipe:rewrite-netty org.openrewrite.recipe:rewrite-okhttp org.openrewrite.recipe:rewrite-openapi org.openrewrite.recipe:rewrite-prethink org.openrewrite.recipe:rewrite-quarkus org.openrewrite.recipe:rewrite-reactive-streams org.openrewrite.recipe:rewrite-rewrite org.openrewrite.recipe:rewrite-spring org.openrewrite.recipe:rewrite-spring-to-quarkus org.openrewrite.recipe:rewrite-sql org.openrewrite.recipe:rewrite-static-analysis org.openrewrite.recipe:rewrite-struts org.openrewrite.recipe:rewrite-terraform org.openrewrite.recipe:rewrite-testing-frameworks org.openrewrite.recipe:rewrite-third-party
-            mod config recipes list | head -20
-            mod config agent-tools copilot install
-            mod build .
-            TRACE_JSON=$(ls .moderne/build/*/trace.json 2>/dev/null | head -1)
-            if [ -z "$TRACE_JSON" ]; then
-              echo "::error::No trace.json found after mod build — cannot verify LST health"
-              exit 1
-            fi
-            PARSE_ERRORS=$(python3 -c "import sys,json; d=json.load(open(sys.argv[1])); print(d['build']['parseErrorCount'])" "$TRACE_JSON")
-            if [ "$PARSE_ERRORS" -gt 0 ]; then
-              echo "::error::LST build has $PARSE_ERRORS parse errors — Tier-2 MCP tools will be unavailable"
-              exit 1
-            fi
-       - name: Pre-warm MCP LST
-         run: |
-            # Launch mod mcp in background and send a JSON-RPC initialization handshake so it
-            # builds and caches the LST index into .moderne/mcp/lst/. When the agent
-            # session later starts mod mcp it finds the cache valid and skips the rebuild,
-            # making all Tier-2 MCP tools (find_types, trigrep_search, run_recipe, …)
-            # available immediately.
-            printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"setup","version":"1.0"}}}\n' \
-              | timeout 120 mod mcp &
-            MCP_PID=$!
-            for attempt in $(seq 1 60); do
-              if [ -f .moderne/mcp/lst/cache-manifest.json ] && [ -d .moderne/mcp/lst/objects ]; then
-                echo "MCP LST cache is ready."
-                break
-              fi
-              sleep 2
-            done
-            kill $MCP_PID 2>/dev/null || true
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Moderne CLI
+        run: |
+          curl https://dev.moderne.io/cli | bash
+          echo "version=LATEST" > $HOME/.moderne/cli/dist/moderne-wrapper.properties
+          echo "$HOME/.moderne/cli/bin" >> "$GITHUB_PATH"
+      - name: Update and Activate Moderne CLI
+        run: |
+           mod --version
+           mod config moderne edit https://app.moderne.io
+           mod config moderne login --with-token ${{ secrets.MODERNE_PLATFORM_PAT }}
+           mod config license edit ${{ secrets.MODERNE_LICENSE_KEY_ALTERNATIVE }}
+           mod config moderne show
+           mod config http trust-store edit file /etc/ssl/certs/adoptium/cacerts
+           mod config recipes artifacts maven add https://repo.maven.apache.org/maven2
+      - name: Install recipes and build
+        run:  |
+           mod config recipes jar install io.moderne.recipe:rewrite-cryptography io.moderne.recipe:rewrite-dropwizard io.moderne.recipe:rewrite-elastic io.moderne.recipe:rewrite-hibernate io.moderne.recipe:rewrite-jasperreports io.moderne.recipe:rewrite-java-application-server io.moderne.recipe:rewrite-kafka io.moderne.recipe:rewrite-spring io.moderne.recipe:rewrite-tapestry io.moderne.recipe:rewrite-vulncheck org.openrewrite:rewrite-core org.openrewrite:rewrite-docker org.openrewrite:rewrite-gradle org.openrewrite:rewrite-groovy org.openrewrite:rewrite-hcl org.openrewrite:rewrite-java org.openrewrite:rewrite-json org.openrewrite:rewrite-maven org.openrewrite:rewrite-properties org.openrewrite:rewrite-protobuf org.openrewrite:rewrite-templating org.openrewrite:rewrite-toml org.openrewrite:rewrite-xml org.openrewrite:rewrite-yaml org.openrewrite.meta:rewrite-analysis org.openrewrite.recipe:rewrite-ai-search org.openrewrite.recipe:rewrite-all org.openrewrite.recipe:rewrite-apache org.openrewrite.recipe:rewrite-circleci org.openrewrite.recipe:rewrite-codemods org.openrewrite.recipe:rewrite-codemods-ng org.openrewrite.recipe:rewrite-compiled-analysis org.openrewrite.recipe:rewrite-concourse org.openrewrite.recipe:rewrite-cucumber-jvm org.openrewrite.recipe:rewrite-dotnet org.openrewrite.recipe:rewrite-feature-flags org.openrewrite.recipe:rewrite-github-actions org.openrewrite.recipe:rewrite-gitlab org.openrewrite.recipe:rewrite-hibernate org.openrewrite.recipe:rewrite-jackson org.openrewrite.recipe:rewrite-java-dependencies org.openrewrite.recipe:rewrite-java-security org.openrewrite.recipe:rewrite-jenkins org.openrewrite.recipe:rewrite-joda org.openrewrite.recipe:rewrite-kubernetes org.openrewrite.recipe:rewrite-liberty org.openrewrite.recipe:rewrite-logging-frameworks org.openrewrite.recipe:rewrite-micrometer org.openrewrite.recipe:rewrite-micronaut org.openrewrite.recipe:rewrite-migrate-java org.openrewrite.recipe:rewrite-migrate-kotlin org.openrewrite.recipe:rewrite-netty org.openrewrite.recipe:rewrite-okhttp org.openrewrite.recipe:rewrite-openapi org.openrewrite.recipe:rewrite-prethink org.openrewrite.recipe:rewrite-quarkus org.openrewrite.recipe:rewrite-reactive-streams org.openrewrite.recipe:rewrite-rewrite org.openrewrite.recipe:rewrite-spring org.openrewrite.recipe:rewrite-spring-to-quarkus org.openrewrite.recipe:rewrite-sql org.openrewrite.recipe:rewrite-static-analysis org.openrewrite.recipe:rewrite-struts org.openrewrite.recipe:rewrite-terraform org.openrewrite.recipe:rewrite-testing-frameworks org.openrewrite.recipe:rewrite-third-party
+           mod config recipes list | head -20
+           mod config agent-tools copilot install
+           mod build .
+           TRACE_JSON=$(ls .moderne/build/*/trace.json 2>/dev/null | head -1)
+           if [ -z "$TRACE_JSON" ]; then
+             echo "::error::No trace.json found after mod build — cannot verify LST health"
+             exit 1
+           fi
+           PARSE_ERRORS=$(python3 -c "import sys,json; d=json.load(open(sys.argv[1])); print(d['build']['parseErrorCount'])" "$TRACE_JSON")
+           if [ "$PARSE_ERRORS" -gt 0 ]; then
+             echo "::error::LST build has $PARSE_ERRORS parse errors — Tier-2 MCP tools will be unavailable"
+             exit 1
+           fi
+      - name: Pre-warm MCP LST
+        run: |
+           # Perform a full MCP JSON-RPC handshake with mod mcp and wait until all
+           # Tier-2 tools (run_recipe, learn_recipe, find_types, …) are confirmed
+           # available. This populates .moderne/mcp/lst/ so the Copilot agent session
+           # loads from cache rather than rebuilding, minimising startup latency.
+           # The step fails the build if tools don't appear within 120 s so broken
+           # setups are caught during CI rather than silently at agent start.
+           python3 - << 'PYEOF'
+import subprocess, json, time, select, sys
+
+proc = subprocess.Popen(
+    ['mod', 'mcp'],
+    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+)
+
+req_id = [0]
+pending = {}
+
+def send(method, params=None, callback=None):
+    req_id[0] += 1
+    rid = req_id[0]
+    msg = {"jsonrpc": "2.0", "id": rid, "method": method}
+    if params:
+        msg["params"] = params
+    if callback:
+        pending[rid] = callback
+    proc.stdin.write(json.dumps(msg) + "\n")
+    proc.stdin.flush()
+    return rid
+
+def notify(method):
+    proc.stdin.write(json.dumps({"jsonrpc": "2.0", "method": method}) + "\n")
+    proc.stdin.flush()
+
+# Tier-2 tools that require a healthy LST — a subset check is sufficient
+TIER2_TOOLS = {"run_recipe", "learn_recipe", "search_recipes", "find_types",
+               "find_methods", "find_annotations", "find_implementations",
+               "change_type", "change_method_name"}
+
+last_change = [None]
+tools_queried = [False]
+all_ready = [False]
+start = time.time()
+
+send("initialize", {
+    "protocolVersion": "2024-11-05",
+    "capabilities": {},
+    "clientInfo": {"name": "setup-prewarm", "version": "1.0"}
+})
+
+deadline = time.time() + 120
+while time.time() < deadline:
+    r, _, _ = select.select([proc.stdout], [], [], 0.3)
+    now = time.time()
+    if r:
+        line = proc.stdout.readline()
+        if not line.strip():
+            continue
+        try:
+            msg = json.loads(line.strip())
+            method = msg.get("method", "")
+            rid = msg.get("id")
+            if rid == 1 and "result" in msg:
+                notify("notifications/initialized")
+            elif method == "notifications/tools/list_changed":
+                last_change[0] = now
+                tools_queried[0] = False
+            elif rid in pending:
+                cb = pending.pop(rid)
+                cb(msg.get("result", {}))
+        except Exception:
+            pass
+
+    # Debounce: query tool list 0.5 s after the last change notification settles
+    if last_change[0] and not tools_queried[0] and (now - last_change[0]) > 0.5:
+        def on_tools(result):
+            names = {t["name"] for t in result.get("tools", [])}
+            elapsed = time.time() - start
+            print(f"[{elapsed:.1f}s] {len(names)} MCP tools available", flush=True)
+            if TIER2_TOOLS.issubset(names):
+                all_ready[0] = True
+                print(f"[{elapsed:.1f}s] All Tier-2 MCP tools confirmed — cache is hot.", flush=True)
+        send("tools/list", callback=on_tools)
+        tools_queried[0] = True
+
+    if all_ready[0]:
+        break
+
+proc.terminate()
+proc.wait(timeout=5)
+
+if not all_ready[0]:
+    print("::error::Tier-2 MCP tools did not become available within 120 s. "
+          "Check that the LST built cleanly (parse errors = 0) and that the "
+          "Moderne license key is valid.", file=sys.stderr)
+    sys.exit(1)
+PYEOF
