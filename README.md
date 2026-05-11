@@ -6,14 +6,14 @@ A Dropwizard 4 REST service for tracking registered magicians, built as a realis
 
 ## Tech Stack
 
-- **Java 25**, **Maven**, **Dropwizard 4.0.2**
+- **Java 11**, **Maven**, **Dropwizard 4.0.2**
 - **JDBI3** for data access
 - **H2** in-memory database (PostgreSQL-compatible mode)
 - **Swagger / OpenAPI** via smoketurner dropwizard-swagger
 
 ## Prerequisites
 
-- JDK 25+ (`java -version`)
+- JDK 11+ (`java -version`)
 - Maven 3.8+ (`mvn -version`)
 
 ## Build
