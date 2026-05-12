@@ -1,5 +1,6 @@
 package org.ministry.magic.service;
 
+import jakarta.ws.rs.WebApplicationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,6 @@ import org.ministry.magic.db.WizardDAO;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.ws.rs.WebApplicationException;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
