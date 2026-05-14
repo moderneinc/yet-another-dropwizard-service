@@ -26,10 +26,10 @@ If the user already knows the exact recipe name or provides a path to a local re
 
 **Never guess recipe names.** Only use names returned by a search or that the user explicitly provides.
 
-**If `edit_code` / `analyze_code` and `learn_recipe` MCP tools are available** (provided by `mod mcp`):
+**If `search_recipes` and `learn_recipe` MCP tools are available** (provided by `mod mcp`):
 
-1. Use `edit_code` (to modify the codebase) or `analyze_code` (to examine it without changes) with natural-language queries to find recipes by keyword:
-   - Example queries: "migrate persistence namespace", "remove unused imports", "upgrade test framework"
+1. Use `search_recipes` with natural-language queries to find recipes by keyword:
+   - Example queries: "migrate to Spring Boot 3", "remove unused imports", "upgrade JUnit 5"
    - Results include the fully-qualified recipe name and display name
    - Paginate with the `offset` parameter (25 results per page)
 
@@ -242,7 +242,7 @@ If recipe needs fixes:
 
 ## Reference
 
-Search recipes: `edit_code` (for modifications) or `analyze_code` (for non-modifying analysis) MCP tool, or `<CLI> config recipes search "<query>"`
+Search recipes: `search_recipes` MCP tool, or `<CLI> config recipes search "<query>"`
 
 Learn recipe details: `learn_recipe` MCP tool with the fully-qualified recipe name
 
