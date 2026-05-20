@@ -22,7 +22,7 @@ public class WizardAuthService {
             byte[] hash = md.digest(password.getBytes());
             StringBuilder sb = new StringBuilder();
             for (byte b : hash) {
-                sb.append(String.format("%02x", b));
+                sb.append("%02x".formatted(b));
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
