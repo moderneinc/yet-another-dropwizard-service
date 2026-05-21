@@ -57,8 +57,10 @@ jobs:
           # Two things this step must get right:
           #
           #   1. stdin stays OPEN.  Mcp.java's stdinClosed latch shuts the server
-          #      down on EOF.  We hold the FIFO write end on FD 3 so the reader
-          #      (mod mcp) never sees EOF until we close it explicitly.
+          #      down on EOF.  Process substitution with a long-running `sleep`
+          #      gives mod mcp a stdin source the SHELL doesn't hold the write
+          #      end of — so there's no FD-inheritance trap that would keep the
+          #      pipe alive after we want it closed.
           #
           #   2. Poll for treeHash == HEAD^{tree}, not just file existence.  A
           #      stale cache-manifest.json from a prior commit would otherwise
@@ -69,10 +71,7 @@ jobs:
           HEAD_TREE=$(git rev-parse "HEAD^{tree}")
           echo "HEAD tree: $HEAD_TREE"
 
-          FIFO=$(mktemp -u /tmp/mcp-stdin-XXXXXX)
-          mkfifo "$FIFO"
-          exec 3>"$FIFO"
-          mod mcp < "$FIFO" > /tmp/mod-mcp.log 2>&1 &
+          mod mcp > /tmp/mod-mcp.log 2>&1 < <(sleep 900) &
           MCP_PID=$!
 
           CACHE_TREE=""
@@ -89,15 +88,15 @@ jobs:
               echo "::error::mod mcp exited during prewarm"
               echo "---- mod mcp log ----"
               cat /tmp/mod-mcp.log || true
-              exec 3>&-
-              rm -f "$FIFO"
               exit 1
             fi
           done
 
-          exec 3>&-
-          wait "$MCP_PID" 2>/dev/null || true
-          rm -f "$FIFO"
+          # Force-kill mod mcp + the sleep that feeds its stdin.  Don't wait on
+          # mod mcp — if it doesn't exit on SIGTERM (e.g. stuck in LST build) we
+          # don't want this step to hang.  The runner reaps everything anyway.
+          kill "$MCP_PID" 2>/dev/null || true
+          pkill -P $$ -x sleep 2>/dev/null || true
 
           if [ "$CACHE_TREE" != "$HEAD_TREE" ]; then
             echo "::error::MCP LST cache treeHash did not match HEAD after 600s (HEAD=$HEAD_TREE cache=${CACHE_TREE:-MISSING})"
