@@ -4,8 +4,8 @@
 
 Before proceeding, verify Moderne skills are up to date:
 1. Run `mod --version` to get the CLI version (e.g., "v3.57.0"), stripping any leading "v"
-2. Read `~/.claude/marketplaces/moderne/moderne/.claude-plugin/plugin.json` and extract the `version` field
-3. If the versions don't match (or plugin.json doesn't exist), run `mod config agent-tools skills install` to sync them
+2. Compare against the version this skill was installed with: `4.3.0-SNAPSHOT`
+3. If the versions don't match, run `mod config agent-tools skills install` to sync them and re-read this file
 
 ## When to Use
 
