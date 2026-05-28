@@ -9,12 +9,12 @@ $ARGUMENTS - Optional arguments:
 
 ## Instructions
 
-### Step 0: Check Plugin Version
+### Step 0: Check Skill Version
 
 Before proceeding, verify Moderne skills are up to date:
 1. Run `<CLI> --version` to get the CLI version (e.g., "v3.57.0"), stripping any leading "v"
-2. Read `~/.claude/marketplaces/moderne/moderne/.claude-plugin/plugin.json` and extract the `version` field
-3. If the versions don't match (or plugin.json doesn't exist), run `<CLI> config agent-tools skills install` to sync them
+2. Compare against the version this skill was installed with: `4.3.0-SNAPSHOT`
+3. If the versions don't match, run `<CLI> config agent-tools skills install` to sync them and re-read this file
 
 ### Step 1: Determine CLI Command
 
@@ -26,10 +26,10 @@ If the user already knows the exact recipe name or provides a path to a local re
 
 **Never guess recipe names.** Only use names returned by a search or that the user explicitly provides.
 
-**If `search_recipes` and `learn_recipe` MCP tools are available** (provided by `mod mcp`):
+**If `edit_code` / `analyze_code` and `learn_recipe` MCP tools are available** (provided by `mod mcp`):
 
-1. Use `search_recipes` with natural-language queries to find recipes by keyword:
-   - Example queries: "migrate to Spring Boot 3", "remove unused imports", "upgrade JUnit 5"
+1. Use `edit_code` (to modify the codebase) or `analyze_code` (to examine it without changes) with natural-language queries to find recipes by keyword:
+   - Example queries: "migrate persistence namespace", "remove unused imports", "upgrade test framework"
    - Results include the fully-qualified recipe name and display name
    - Paginate with the `offset` parameter (25 results per page)
 
@@ -242,7 +242,7 @@ If recipe needs fixes:
 
 ## Reference
 
-Search recipes: `search_recipes` MCP tool, or `<CLI> config recipes search "<query>"`
+Search recipes: `edit_code` (for modifications) or `analyze_code` (for non-modifying analysis) MCP tool, or `<CLI> config recipes search "<query>"`
 
 Learn recipe details: `learn_recipe` MCP tool with the fully-qualified recipe name
 

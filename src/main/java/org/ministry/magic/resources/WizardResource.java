@@ -17,7 +17,6 @@ import org.ministry.magic.service.WizardService;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Path("/api/wizards")
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,7 +66,7 @@ public class WizardResource {
 
         return wizards.stream()
                 .map(WizardResponse::fromWizard)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @PUT
