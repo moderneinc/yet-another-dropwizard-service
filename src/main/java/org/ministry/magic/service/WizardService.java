@@ -123,46 +123,35 @@ public class WizardService {
     }
 
     public String describeRegistrationEvent(Object event) {
-        if (event instanceof Wizard) {
-            Wizard w = (Wizard) event;
+        if (event instanceof Wizard w) {
             return "Wizard registration: " + w.getFirstName() + " " + w.getLastName();
-        } else if (event instanceof String) {
-            String msg = (String) event;
+        } else if (event instanceof String msg) {
             return "Registry message: " + msg;
-        } else if (event instanceof List) {
-            List list = (List) event;
+        } else if (event instanceof List<?> list) {
             return "Batch event: " + list.size() + " records";
         }
         return "Unknown event type";
     }
 
     public String getHouseDescription(org.ministry.magic.core.House house) {
-        String description;
-        switch (house) {
-            case GRYFFINDOR:
-                description = "Brave at heart, dwell in nerve and chivalry";
-                break;
-            case HUFFLEPUFF:
-                description = "Just and loyal, patient and true";
-                break;
-            case RAVENCLAW:
-                description = "Wit beyond measure is man's greatest treasure";
-                break;
-            case SLYTHERIN:
-                description = "Cunning folk use any means to achieve their ends";
-                break;
-            default:
-                description = "Unaffiliated with a Hogwarts house";
-        }
-        return description;
+        return switch (house) {
+            case GRYFFINDOR -> "Brave at heart, dwell in nerve and chivalry";
+            case HUFFLEPUFF -> "Just and loyal, patient and true";
+            case RAVENCLAW -> "Wit beyond measure is man's greatest treasure";
+            case SLYTHERIN -> "Cunning folk use any means to achieve their ends";
+            case NONE -> "Unaffiliated with a Hogwarts house";
+        };
     }
 
     public String buildWizardSummaryHtml(Wizard wizard) {
-        return "<div class=\"wizard-card\">\n" +
-               "  <h2>" + wizard.getFirstName() + " " + wizard.getLastName() + "</h2>\n" +
-               "  <p>House: <strong>" + wizard.getHouse() + "</strong></p>\n" +
-               "  <p>Status: <span class=\"status\">" + wizard.getStatus() + "</span></p>\n" +
-               "  <p>Patronus: " + wizard.getPatronus() + "</p>\n" +
-               "</div>";
+        return """
+               <div class="wizard-card">
+                 <h2>%s %s</h2>
+                 <p>House: <strong>%s</strong></p>
+                 <p>Status: <span class="status">%s</span></p>
+                 <p>Patronus: %s</p>
+               </div>""".formatted(
+                wizard.getFirstName(), wizard.getLastName(),
+                wizard.getHouse(), wizard.getStatus(), wizard.getPatronus());
     }
 }
