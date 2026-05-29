@@ -43,3 +43,4 @@ jobs:
              exit 1
            fi
            echo "LST build found via mod list"
+           mod config agent-tools copilot install
