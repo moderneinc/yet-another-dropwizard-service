@@ -1,0 +1,2 @@
+Entity ID,Source path,Client class,Target service,Client type,Protocol,Base URL
+external:org.ministry.magic.WizardRegistryApplicationIT,src/test/java/org/ministry/magic/WizardRegistryApplicationIT.java,org.ministry.magic.WizardRegistryApplicationIT,Wizard Registry Application I T Service,JAX-RS Client,,

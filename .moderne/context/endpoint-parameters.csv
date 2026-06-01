@@ -1,0 +1,9 @@
+Endpoint ID,Parameter name,Parameter kind,Type FQN,Type resolution,Format,Required,Default value,Java parameter name
+endpoint:org.ministry.magic.resources.WizardReportResource#downloadReport(String),filename,path,java.lang.String,resolved,,true,,filename
+endpoint:org.ministry.magic.resources.WizardResource#getWizard(UUID),id,path,java.util.UUID,resolved,uuid,true,,id
+"endpoint:org.ministry.magic.resources.WizardResource#listWizards(String,String,String)",house,query,java.lang.String,resolved,,true,,house
+"endpoint:org.ministry.magic.resources.WizardResource#listWizards(String,String,String)",status,query,java.lang.String,resolved,,true,,status
+"endpoint:org.ministry.magic.resources.WizardResource#listWizards(String,String,String)",q,query,java.lang.String,resolved,,true,,query
+"endpoint:org.ministry.magic.resources.WizardResource#updateWizard(UUID,UpdateWizardRequest)",id,path,java.util.UUID,resolved,uuid,true,,id
+"endpoint:org.ministry.magic.resources.WizardResource#updateStatus(UUID,String)",id,path,java.util.UUID,resolved,uuid,true,,id
+endpoint:org.ministry.magic.resources.WizardResource#deregisterWizard(UUID),id,path,java.util.UUID,resolved,uuid,true,,id
