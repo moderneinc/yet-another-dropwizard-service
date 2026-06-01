@@ -85,7 +85,7 @@ public class WizardResource {
         try {
             RegistrationStatus status = RegistrationStatus.valueOf(newStatus.trim().toUpperCase());
             return WizardResponse.fromWizard(service.updateStatus(id, status));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             throw new WebApplicationException("Invalid status: " + newStatus, Response.Status.BAD_REQUEST);
         }
     }
