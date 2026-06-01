@@ -1,0 +1,19 @@
+Fixture path,JSON path,Value,Value type
+src/test/resources/test-wizard-registry.yml,server.applicationConnectors[0].type,http,string
+src/test/resources/test-wizard-registry.yml,server.applicationConnectors[0].port,0,number
+src/test/resources/test-wizard-registry.yml,server.adminConnectors[0].type,http,string
+src/test/resources/test-wizard-registry.yml,server.adminConnectors[0].port,0,number
+src/test/resources/test-wizard-registry.yml,database.driverClass,org.h2.Driver,string
+src/test/resources/test-wizard-registry.yml,database.url,jdbc:h2:mem:test-wizards;DB_CLOSE_DELAY=-1;MODE=PostgreSQL,string
+src/test/resources/test-wizard-registry.yml,database.user,sa,string
+src/test/resources/test-wizard-registry.yml,database.password,,null
+src/test/resources/test-wizard-registry.yml,database.maxSize,4,number
+src/test/resources/test-wizard-registry.yml,database.minSize,1,number
+src/test/resources/test-wizard-registry.yml,database.initialSize,1,number
+src/test/resources/test-wizard-registry.yml,database.validationQuery,SELECT 1,string
+src/test/resources/test-wizard-registry.yml,swagger.resourcePackage,org.ministry.magic.resources,string
+src/test/resources/test-wizard-registry.yml,swagger.title,Wizard Registry API (Test),string
+src/test/resources/test-wizard-registry.yml,swagger.description,Ministry of Magic — Test Environment,string
+src/test/resources/test-wizard-registry.yml,swagger.version,1.0,number
+src/test/resources/test-wizard-registry.yml,logging.level,WARN,string
+src/test/resources/test-wizard-registry.yml,logging.loggers.org.ministry.magic,INFO,string

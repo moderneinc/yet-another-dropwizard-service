@@ -1,0 +1,97 @@
+{
+  "nodes" : [ {
+    "unique-id" : "create-wizard-request-data",
+    "node-type" : "data-asset",
+    "name" : "CreateWizardRequest",
+    "description" : "DTO create wizard request with fields: firstName, lastName, dateOfBirth, house, patronus and 3 more"
+  }, {
+    "unique-id" : "update-wizard-request-data",
+    "node-type" : "data-asset",
+    "name" : "UpdateWizardRequest",
+    "description" : "DTO update wizard request with fields: patronus, wandWood, wandCore, wandLengthInches"
+  }, {
+    "unique-id" : "wizard-import-resource",
+    "node-type" : "service",
+    "name" : "WizardImportResource",
+    "description" : "REST API with endpoints: POST /api/wizards/import",
+    "interfaces" : [ {
+      "unique-id" : "wizard-import-resource-api",
+      "port" : 8080
+    } ]
+  }, {
+    "unique-id" : "wizard-registry",
+    "node-type" : "system",
+    "name" : "Wizard Registry Service",
+    "description" : "Ministry of Magic — Registered Wizards Management Service"
+  }, {
+    "unique-id" : "wizard-registry-application-i-t-service",
+    "node-type" : "service",
+    "name" : "Wizard Registry Application I T Service",
+    "description" : "External JAX-RS Client service"
+  }, {
+    "unique-id" : "wizard-report-resource",
+    "node-type" : "service",
+    "name" : "WizardReportResource",
+    "description" : "REST API with endpoints: GET /api/reports/{filename}",
+    "interfaces" : [ {
+      "unique-id" : "wizard-report-resource-api",
+      "port" : 8080
+    } ]
+  }, {
+    "unique-id" : "wizard-resource",
+    "node-type" : "service",
+    "name" : "WizardResource",
+    "description" : "REST API with endpoints: POST /api/wizards, GET /api/wizards/{id}, GET /api/wizards, PUT /api/wizards/{id}, PATCH /api/wizards/{id}/status and 1 more",
+    "interfaces" : [ {
+      "unique-id" : "wizard-resource-api",
+      "port" : 8080
+    } ]
+  }, {
+    "unique-id" : "wizard-response-data",
+    "node-type" : "data-asset",
+    "name" : "WizardResponse",
+    "description" : "DTO wizard response with fields: id, firstName, lastName, dateOfBirth, house and 7 more"
+  } ],
+  "relationships" : [ {
+    "unique-id" : "wizard-import-resource-uses-create-wizard-request-data",
+    "relationship-type" : {
+      "interacts" : {
+        "actor" : "wizard-import-resource",
+        "nodes" : [ "create-wizard-request-data" ]
+      }
+    }
+  }, {
+    "unique-id" : "wizard-registry-application-i-t-service-uses-create-wizard-request-data",
+    "relationship-type" : {
+      "interacts" : {
+        "actor" : "wizard-registry-application-i-t-service",
+        "nodes" : [ "create-wizard-request-data" ]
+      }
+    }
+  }, {
+    "unique-id" : "wizard-registry-application-i-t-service-uses-update-wizard-request-data",
+    "relationship-type" : {
+      "interacts" : {
+        "actor" : "wizard-registry-application-i-t-service",
+        "nodes" : [ "update-wizard-request-data" ]
+      }
+    }
+  }, {
+    "unique-id" : "wizard-registry-composed-of-services",
+    "relationship-type" : {
+      "composed-of" : {
+        "container" : "wizard-registry",
+        "nodes" : [ "wizard-import-resource", "wizard-report-resource", "wizard-resource" ]
+      }
+    }
+  }, {
+    "unique-id" : "wizard-resource-uses-wizard-response-data",
+    "relationship-type" : {
+      "interacts" : {
+        "actor" : "wizard-resource",
+        "nodes" : [ "wizard-response-data" ]
+      }
+    }
+  } ],
+  "$schema" : "https://calm.finos.org/draft/2025-03/meta/calm.json"
+}

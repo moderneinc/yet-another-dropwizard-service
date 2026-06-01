@@ -1,0 +1,12 @@
+Package name,Afferent coupling (Ca),Efferent coupling (Ce),Instability,Abstractness,Distance from main sequence,In cycle,Cycle members
+org.ministry.magic.managed,1,2,0.6666666666666666,0.0,0.33333333333333337,false,
+org.ministry.magic.filter,1,0,0.0,0.0,1.0,false,
+org.ministry.magic.api,3,1,0.25,0.0,0.75,false,
+org.ministry.magic.resources,1,3,0.75,0.0,0.25,false,
+org.ministry.magic.bundle,1,0,0.0,0.0,1.0,false,
+org.ministry.magic.health,1,1,0.5,0.0,0.5,false,
+org.ministry.magic.db,3,1,0.25,0.0,0.75,false,
+org.ministry.magic.service,4,3,0.42857142857142855,0.0,0.5714285714285714,false,
+org.ministry.magic.servlet,1,1,0.5,0.0,0.5,false,
+org.ministry.magic,0,10,1.0,0.0,0.0,false,
+org.ministry.magic.core,6,0,0.0,0.0,1.0,false,
