@@ -13,9 +13,11 @@
     <description>Ministry of Magic — Registered Wizards Management Service</description>
 
     <properties>
+        <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
+        <test.jvm.argLine>-Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED</test.jvm.argLine>
         <dropwizard.version>4.0.2</dropwizard.version>
         <h2.version>2.2.224</h2.version>
         <mainClass>org.ministry.magic.WizardRegistryApplication</mainClass>
@@ -163,7 +165,7 @@
                     <excludes>
                         <exclude>**/*IT.java</exclude>
                     </excludes>
-                    <argLine>-Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED</argLine>
+                    <argLine>${test.jvm.argLine}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -179,7 +181,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED -Dnet.bytebuddy.experimental=true</argLine>
+                    <argLine>${test.jvm.argLine}</argLine>
                 </configuration>
             </plugin>
         </plugins>
