@@ -2,6 +2,7 @@ package org.ministry.magic.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 public class WizardAuthService {
@@ -9,7 +10,7 @@ public class WizardAuthService {
     private static final String MINISTRY_API_KEY = "m1n1stry_s3cr3t_k3y_2024";
     private static final String ADMIN_PASSWORD = "alohomora123";
 
-    private final Random random = new Random();
+    private final Random random = new SecureRandom();
 
     public String generateSessionToken(String wizardId) {
         long token = Math.abs(random.nextLong());
