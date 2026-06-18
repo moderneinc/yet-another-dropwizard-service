@@ -1,17 +1,17 @@
 Convention type,Pattern,Example,Frequency,Scope
-naming,get* method naming pattern,getName,,project-wide
-naming,Configuration suffix for classes,WizardRegistryConfiguration,,project-wide
-naming,set* method naming pattern,setDataSourceFactory,,project-wide
-naming,Factory suffix for classes,LoggingConfigurationFactoryFactory,,project-wide
+imports,Static imports from org.assertj.core.api,org.assertj.core.api.Assertions.assertThat,,project-wide
+naming,Test suffix for classes,WizardRegistryConfigurationTest,,project-wide
+naming,can* method naming pattern,canDeserializeFromYaml,,project-wide
+naming,UPPER_SNAKE_CASE for constants,APP,,project-wide
+naming,set* method naming pattern,setUp,,project-wide
+imports,Static imports from org.mockito,org.mockito.ArgumentMatchers.any,,project-wide
+naming,get* method naming pattern,getWizardThrowsNotFoundForMissingId,,project-wide
+naming,update* method naming pattern,updateWizardModifiesMutableFields,,project-wide
+naming,create* method naming pattern,createTestWizard,,project-wide
 naming,camelCase for constants,log,,project-wide
-naming,create* method naming pattern,createTable,,project-wide
+naming,Configuration suffix for classes,WizardRegistryConfiguration,,project-wide
+naming,Factory suffix for classes,LoggingConfigurationFactoryFactory,,project-wide
 naming,find* method naming pattern,findById,,project-wide
-naming,update* method naming pattern,updateStatus,,project-wide
-naming,UPPER_SNAKE_CASE for constants,REPORTS_BASE_DIR,,project-wide
 naming,Service suffix for classes,WizardAuthService,,project-wide
 naming,validate* method naming pattern,validateApiKey,,project-wide
 naming,build* method naming pattern,buildWizardSummaryHtml,,project-wide
-imports,Static imports from org.assertj.core.api,org.assertj.core.api.Assertions.assertThat,,project-wide
-naming,can* method naming pattern,canRetrieveConfiguration,,project-wide
-naming,Test suffix for classes,WizardRegistryConfigurationTest,,project-wide
-imports,Static imports from org.mockito,org.mockito.ArgumentMatchers.any,,project-wide

@@ -1,3 +1,70 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+A small **Dropwizard 4.0.2 / Java 11** REST service (`wizard-registry`) for managing wizard
+registrations — built as a workshop demo for **OpenRewrite migration exercises**. Maven project,
+group `org.ministry.magic`, artifact `wizard-registry`.
+
+## Commands
+
+```bash
+mvn clean verify                       # full build: 11 unit tests + 11 integration tests
+mvn surefire:test                      # unit tests only (excludes **/*IT.java)
+mvn failsafe:integration-test          # integration tests only (**/*IT.java)
+mvn test -Dtest=WizardServiceTest      # single test class
+mvn test -Dtest=WizardServiceTest#methodName   # single test method
+mvn clean package -DskipTests          # build runnable shaded jar
+
+# run locally (app :8080, admin :8081, Swagger UI :8080/swagger)
+java -jar target/wizard-registry-1.0-SNAPSHOT.jar server src/main/resources/wizard-registry.yml
+
+mod build .                            # build OpenRewrite LST into .moderne/build/ for recipe runs
+```
+
+Tests split by filename: `*Test.java` → Surefire (unit), `*IT.java` → Failsafe (integration).
+`net.bytebuddy.experimental=true` is set for Surefire so Mockito works on Java 11.
+
+## Architecture
+
+**No DI container.** `WizardRegistryApplication.run()` is the single composition root — it manually
+constructs and wires every component in order. To add any runtime component (resource, health check,
+managed object, servlet, filter), wire it there.
+
+Request flow follows a strict layering — **keep changes within it**:
+```
+resources (JAX-RS)  →  service (business rules)  →  db (JDBI3 DAO + RowMapper)  →  core/api (domain + DTOs)
+```
+
+Wiring specifics worth knowing before editing:
+- **DB**: `DataSourceFactory` from YAML → `ManagedDataSource` (lifecycle-managed, auto-commit off) →
+  `Jdbi.create(...)` → `WizardDAO`. H2 in PostgreSQL-compatibility mode.
+- **Schema + seed**: `WizardRegistryManaged` (a Dropwizard `Managed`) creates the schema and seeds
+  ~10 wizards on startup. New persisted fields must be threaded through here too.
+- **Service shared with servlet**: `WizardService` is stashed as the `"wizardService"` servlet-context
+  attribute so `MinistryStatusServlet` (`/ministry/status`, plain HTML) can reach it.
+- **Audit filter**: `AuditLogFilter` is mapped to `/api/*`. Keep new audited public paths under `/api/`.
+- **Bootstrap (initialize)**: custom `LoggingConfigurationFactoryFactory`, `MultiPartBundle`,
+  `SwaggerBundle`, and a `JavaTimeModule` registered on the object mapper (needed for `LocalDate`/`Instant`).
+
+## Repo-specific conventions
+
+- IDs are **UUIDs**, not DB-generated integers.
+- Status transitions are guarded in `WizardService.updateStatus` — preserve that logic when adding states/endpoints.
+- Deregistration (`DELETE`) is a **soft delete to `SUSPENDED`**, not a row removal.
+- Treat `target/` and `dependency-reduced-pom.xml` (shade-plugin output) as build artifacts; don't hand-edit.
+- Integration tests run the real app via `DropwizardAppExtension` against an isolated H2 DB
+  (`src/test/resources/test-wizard-registry.yml`).
+
+## Migration-demo caveat
+
+Because this is a refactoring/migration demo, some classes contain **intentional anti-patterns** —
+e.g. `WizardAuthService` (hardcoded secrets, MD5, `Random` tokens), `WizardImportResource` (unhardened
+XML parsing), `WizardReportResource` (filename-based file reads). These are deliberate exercise material;
+don't "fix" them unless that is the explicit task.
+
 <!-- prethink-context -->
 ## Moderne Prethink Context
 
@@ -89,54 +156,3 @@ grep -i "POST" .moderne/context/service-endpoints.csv
 
 When citing Moderne Prethink context, mention Moderne Prethink as the source (e.g., "Based on the architecture context from Moderne Prethink..." or "Based on the test coverage mapping from Prethink, this method is tested by...").
 <!-- /prethink-context -->
-
-# AGENTS
-
-This repository is a small Dropwizard 4 service for managing wizard registrations. Start with the API and runtime overview in [README.md](README.md); use this file for repo-specific execution guidance that is easy to miss from a quick code scan.
-
-## Working Agreement
-
-- Keep changes inside the existing layering: `resources -> service -> db -> core/api`.
-- Prefer editing source under `src/main` and tests under `src/test`; do not hand-edit `target/`.
-- Treat `dependency-reduced-pom.xml` as build output from the shade plugin unless the task is explicitly about packaging.
-- Wire new runtime components in `WizardRegistryApplication`; there is no DI container.
-
-## Build And Validation
-
-- Full validation: `mvn clean verify`
-- Unit tests only: `mvn surefire:test`
-- Integration tests only: `mvn failsafe:integration-test`
-- Build runnable jar without tests: `mvn clean package -DskipTests`
-- Run locally: `java -jar target/wizard-registry-1.0-SNAPSHOT.jar server src/main/resources/wizard-registry.yml`
-
-Use the narrowest validation that matches the slice you changed. For behavior changes in HTTP endpoints, prefer the integration test style in [src/test/java/org/ministry/magic/WizardRegistryApplicationIT.java](src/test/java/org/ministry/magic/WizardRegistryApplicationIT.java). For service-only logic, mirror [src/test/java/org/ministry/magic/service/WizardServiceTest.java](src/test/java/org/ministry/magic/service/WizardServiceTest.java).
-
-## Code Map
-
-- App bootstrap and all runtime wiring: [src/main/java/org/ministry/magic/WizardRegistryApplication.java](src/main/java/org/ministry/magic/WizardRegistryApplication.java)
-- Configuration and YAML-backed settings: [src/main/java/org/ministry/magic/WizardRegistryConfiguration.java](src/main/java/org/ministry/magic/WizardRegistryConfiguration.java), [src/main/resources/wizard-registry.yml](src/main/resources/wizard-registry.yml)
-- REST resources: [src/main/java/org/ministry/magic/resources/](src/main/java/org/ministry/magic/resources/)
-- Business rules and status transitions: [src/main/java/org/ministry/magic/service/WizardService.java](src/main/java/org/ministry/magic/service/WizardService.java)
-- Persistence and SQL/JDBI bindings: [src/main/java/org/ministry/magic/db/](src/main/java/org/ministry/magic/db/)
-- Domain types and enums: [src/main/java/org/ministry/magic/core/](src/main/java/org/ministry/magic/core/)
-- Lifecycle setup, seed data, health, and servlet/filter integrations: [src/main/java/org/ministry/magic/managed/](src/main/java/org/ministry/magic/managed/), [src/main/java/org/ministry/magic/health/](src/main/java/org/ministry/magic/health/), [src/main/java/org/ministry/magic/filter/](src/main/java/org/ministry/magic/filter/), [src/main/java/org/ministry/magic/servlet/](src/main/java/org/ministry/magic/servlet/)
-
-## Repo-Specific Conventions
-
-- IDs are UUIDs, not database-generated integers.
-- Status changes are guarded in `WizardService.updateStatus`; preserve that transition logic when adding new states or endpoints.
-- Deregistration is a soft delete implemented as `SUSPENDED`, not row removal.
-- Integration tests run the real app with `DropwizardAppExtension` and an isolated H2 database in PostgreSQL mode.
-- Request logging for API traffic is handled by `AuditLogFilter` on `/api/*`; keep new public API paths consistent with that mapping if they should be audited.
-
-## Common Edit Routing
-
-- New or changed endpoint: update the resource class first, then the service, then DAO/DTOs as needed.
-- New business rule: change [src/main/java/org/ministry/magic/service/WizardService.java](src/main/java/org/ministry/magic/service/WizardService.java) and add a focused unit test.
-- New persisted field: update the domain model, request/response DTOs, JDBI mapper/SQL, seed/setup logic, and at least one integration test.
-- New startup-managed behavior: wire it in [src/main/java/org/ministry/magic/WizardRegistryApplication.java](src/main/java/org/ministry/magic/WizardRegistryApplication.java).
-
-## References
-
-- API examples and local usage: [README.md](README.md)
-- Test configuration: [src/test/resources/test-wizard-registry.yml](src/test/resources/test-wizard-registry.yml)
