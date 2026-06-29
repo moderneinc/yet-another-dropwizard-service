@@ -1,19 +1,14 @@
 package org.ministry.magic.service;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import org.ministry.magic.api.CreateWizardRequest;
 import org.ministry.magic.api.UpdateWizardRequest;
 import org.ministry.magic.core.RegistrationStatus;
 import org.ministry.magic.core.Wizard;
 import org.ministry.magic.db.WizardDAO;
 
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class WizardService {
 
