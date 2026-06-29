@@ -26,7 +26,6 @@ import org.ministry.magic.servlet.MinistryStatusServlet;
 import java.util.EnumSet;
 
 public class WizardRegistryApplication extends Application<WizardRegistryConfiguration> {
-
     public static void main(String[] args) throws Exception {
         new WizardRegistryApplication().run(args);
     }
