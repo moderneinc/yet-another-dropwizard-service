@@ -123,14 +123,11 @@ public class WizardService {
     }
 
     public String describeRegistrationEvent(Object event) {
-        if (event instanceof Wizard) {
-            Wizard w = (Wizard) event;
+        if (event instanceof Wizard w) {
             return "Wizard registration: " + w.getFirstName() + " " + w.getLastName();
-        } else if (event instanceof String) {
-            String msg = (String) event;
+        } else if (event instanceof String msg) {
             return "Registry message: " + msg;
-        } else if (event instanceof List) {
-            List list = (List) event;
+        } else if (event instanceof List list) {
             return "Batch event: " + list.size() + " records";
         }
         return "Unknown event type";
