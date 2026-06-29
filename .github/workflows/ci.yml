@@ -30,7 +30,7 @@ jobs:
         run: mvn package --batch-mode -DskipTests
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wizard-registry-jar
           path: target/wizard-registry-*.jar
