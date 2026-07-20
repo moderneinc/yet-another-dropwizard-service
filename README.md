@@ -1,5 +1,8 @@
 # Wizard Registry Service
 
+> **⚠️ Demo Repository**
+> This repository is a demo project that shows how **GitHub Copilot Cloud** can be enabled with **Moderne Agent Tooling** to **remediate dependency updates, CVEs, and technical debt** using an **agent-driven, deterministic workflow**.
+
 Ministry of Magic — Registered Wizards Management Service.
 
 A Dropwizard 4 REST service for tracking registered magicians, built as a realistic workshop demo for migration exercises.
