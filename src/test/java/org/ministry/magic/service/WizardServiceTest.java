@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.ws.rs.WebApplicationException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -135,6 +136,28 @@ class WizardServiceTest {
 
         assertThatThrownBy(() -> service.deregisterWizard(id))
                 .isInstanceOf(WebApplicationException.class);
+    }
+
+
+    @Test
+    void describeRegistrationEventHandlesKnownTypes() {
+        Wizard wizard = createTestWizard(UUID.randomUUID(), RegistrationStatus.ACTIVE);
+
+        assertThat(service.describeRegistrationEvent(wizard)).isEqualTo("Wizard registration: Test Wizard");
+        assertThat(service.describeRegistrationEvent("hello")).isEqualTo("Registry message: hello");
+        assertThat(service.describeRegistrationEvent(List.of("a", "b"))).isEqualTo("Batch event: 2 records");
+    }
+
+    @Test
+    void getHouseDescriptionReturnsExpectedDescriptions() {
+        assertThat(service.getHouseDescription(House.GRYFFINDOR))
+                .isEqualTo("Brave at heart, dwell in nerve and chivalry");
+        assertThat(service.getHouseDescription(House.HUFFLEPUFF))
+                .isEqualTo("Just and loyal, patient and true");
+        assertThat(service.getHouseDescription(House.RAVENCLAW))
+                .isEqualTo("Wit beyond measure is man's greatest treasure");
+        assertThat(service.getHouseDescription(House.SLYTHERIN))
+                .isEqualTo("Cunning folk use any means to achieve their ends");
     }
 
     private Wizard createTestWizard(UUID id, RegistrationStatus status) {
