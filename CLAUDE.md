@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A small **Dropwizard 4.0.2 / Java 11** REST service (`wizard-registry`) for managing wizard
+A small **Dropwizard 4.0.2 / Java 25** REST service (`wizard-registry`) for managing wizard
 registrations — built as a workshop demo for **OpenRewrite migration exercises**. Maven project,
 group `org.ministry.magic`, artifact `wizard-registry`.
 
@@ -25,7 +25,7 @@ mod build .                            # build OpenRewrite LST into .moderne/bui
 ```
 
 Tests split by filename: `*Test.java` → Surefire (unit), `*IT.java` → Failsafe (integration).
-`net.bytebuddy.experimental=true` is set for Surefire so Mockito works on Java 11.
+`net.bytebuddy.experimental=true` is set for Surefire so Mockito works on Java 25.
 
 ## Architecture
 
