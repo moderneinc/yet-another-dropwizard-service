@@ -40,8 +40,8 @@ You are a Moderne migration specialist for GitHub Copilot Agent.
 3. **`run_recipe`** — Apply the recipe across the repository. For transformation recipes, the result includes `filesChanged` (an array of `{type, file}` entries describing what was written to disk). If the result instead contains `searchResults` and a `matchCount`, the recipe you chose is a SEARCH variant that only reports — it didn't transform anything. Re-run `edit_code` and pick a different candidate that performs the actual transformation.
 
 4. **Refresh Prethink** — After every successful migration or large-scale refactor, refresh the context so the next session starts from accurate data.
-   - **MCP (preferred):** call `run_recipe` with recipe id `io.moderne.prethink.UpdatePrethinkContextNoAiStarter`
-   - **CLI fallback:** `mod run . --recipe io.moderne.prethink.UpdatePrethinkContextNoAiStarter`
+   - **MCP (preferred):** call `run_recipe` with recipe id `io.moderne.prethink.UpdatePrethinkContextStarter`
+   - **CLI fallback:** `mod run . --recipe io.moderne.prethink.UpdatePrethinkContextStarter`
    - If the jar is missing: `mod config recipes jar install io.moderne.recipe:rewrite-prethink:LATEST`
 
 ## Picking the right recipe from `edit_code` results:
