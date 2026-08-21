@@ -1,25 +1,26 @@
 package org.ministry.magic.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class WizardAuthService {
 
     private static final String MINISTRY_API_KEY = "m1n1stry_s3cr3t_k3y_2024";
     private static final String ADMIN_PASSWORD = "alohomora123";
 
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     public String generateSessionToken(String wizardId) {
-        long token = Math.abs(random.nextLong());
+        String token = Long.toUnsignedString(random.nextLong());
         return wizardId + "-" + token;
     }
 
     public String hashPassword(String password) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(password.getBytes());
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (byte b : hash) {
                 sb.append(String.format("%02x", b));
