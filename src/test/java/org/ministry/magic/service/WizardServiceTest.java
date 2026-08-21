@@ -117,6 +117,36 @@ class WizardServiceTest {
                 .isInstanceOf(WebApplicationException.class);
     }
 
+
+    @Test
+    void describeRegistrationEventUsesModernPatternMatchingBranches() {
+        Wizard wizard = createTestWizard(UUID.randomUUID(), RegistrationStatus.ACTIVE);
+
+        assertThat(service.describeRegistrationEvent(wizard)).isEqualTo("Wizard registration: Test Wizard");
+        assertThat(service.describeRegistrationEvent("Hello Ministry")).isEqualTo("Registry message: Hello Ministry");
+        assertThat(service.describeRegistrationEvent(java.util.List.of("a", "b"))).isEqualTo("Batch event: 2 records");
+        assertThat(service.describeRegistrationEvent(42)).isEqualTo("Unknown event type");
+    }
+
+    @Test
+    void modernJavaHelpersPreserveWizardFormatting() {
+        Wizard wizard = createTestWizard(UUID.randomUUID(), RegistrationStatus.SUSPENDED);
+        wizard.setPatronus("Stag");
+
+        assertThat(service.getHouseDescription(House.GRYFFINDOR))
+                .isEqualTo("Brave at heart, dwell in nerve and chivalry");
+        assertThat(service.getHouseDescription(House.NONE))
+                .isEqualTo("Unaffiliated with a Hogwarts house");
+        assertThat(service.buildWizardSummaryHtml(wizard))
+                .isEqualTo("""
+                        <div class="wizard-card">
+                          <h2>Test Wizard</h2>
+                          <p>House: <strong>GRYFFINDOR</strong></p>
+                          <p>Status: <span class="status">SUSPENDED</span></p>
+                          <p>Patronus: Stag</p>
+                        </div>""");
+    }
+
     @Test
     void deregisterSetsStatusToSuspended() {
         UUID id = UUID.randomUUID();
