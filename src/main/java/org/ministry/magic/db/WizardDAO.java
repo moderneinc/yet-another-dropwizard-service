@@ -22,20 +22,21 @@ public class WizardDAO {
 
     public void createTable() {
         jdbi.useHandle(handle -> handle.execute(
-                "CREATE TABLE IF NOT EXISTS wizards (" +
-                "  id UUID PRIMARY KEY," +
-                "  first_name VARCHAR(200) NOT NULL," +
-                "  last_name VARCHAR(200) NOT NULL," +
-                "  date_of_birth DATE NOT NULL," +
-                "  house VARCHAR(50) NOT NULL," +
-                "  patronus VARCHAR(200)," +
-                "  wand_wood VARCHAR(100)," +
-                "  wand_core VARCHAR(100)," +
-                "  wand_length_inches DOUBLE," +
-                "  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'," +
-                "  registered_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
-                "  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
-                ")"
+                """
+                CREATE TABLE IF NOT EXISTS wizards (\
+                  id UUID PRIMARY KEY,\
+                  first_name VARCHAR(200) NOT NULL,\
+                  last_name VARCHAR(200) NOT NULL,\
+                  date_of_birth DATE NOT NULL,\
+                  house VARCHAR(50) NOT NULL,\
+                  patronus VARCHAR(200),\
+                  wand_wood VARCHAR(100),\
+                  wand_core VARCHAR(100),\
+                  wand_length_inches DOUBLE,\
+                  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',\
+                  registered_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\
+                  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\
+                )"""
         ));
     }
 
@@ -49,10 +50,11 @@ public class WizardDAO {
         }
 
         jdbi.useHandle(handle -> handle.createUpdate(
-                "INSERT INTO wizards (id, first_name, last_name, date_of_birth, house, " +
-                "patronus, wand_wood, wand_core, wand_length_inches, status, registered_at, updated_at) " +
-                "VALUES (:id, :firstName, :lastName, :dateOfBirth, :house, " +
-                ":patronus, :wandWood, :wandCore, :wandLengthInches, :status, :registeredAt, :updatedAt)")
+                """
+                INSERT INTO wizards (id, first_name, last_name, date_of_birth, house, \
+                patronus, wand_wood, wand_core, wand_length_inches, status, registered_at, updated_at) \
+                VALUES (:id, :firstName, :lastName, :dateOfBirth, :house, \
+                :patronus, :wandWood, :wandCore, :wandLengthInches, :status, :registeredAt, :updatedAt)""")
                 .bind("id", wizard.getId())
                 .bind("firstName", wizard.getFirstName())
                 .bind("lastName", wizard.getLastName())
@@ -120,9 +122,10 @@ public class WizardDAO {
     public void update(Wizard wizard) {
         wizard.setUpdatedAt(Instant.now());
         jdbi.useHandle(handle -> handle.createUpdate(
-                "UPDATE wizards SET patronus = :patronus, wand_wood = :wandWood, " +
-                "wand_core = :wandCore, wand_length_inches = :wandLengthInches, " +
-                "status = :status, updated_at = :updatedAt WHERE id = :id")
+                """
+                UPDATE wizards SET patronus = :patronus, wand_wood = :wandWood, \
+                wand_core = :wandCore, wand_length_inches = :wandLengthInches, \
+                status = :status, updated_at = :updatedAt WHERE id = :id""")
                 .bind("id", wizard.getId())
                 .bind("patronus", wizard.getPatronus())
                 .bind("wandWood", wizard.getWandWood())
