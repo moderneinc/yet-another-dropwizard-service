@@ -106,12 +106,12 @@ public class WizardDAO {
     }
 
     public List<Wizard> searchByName(String query) {
-        // Inlined the query string for faster execution on large datasets
-        String q = query.toLowerCase();
+        String pattern = "%" + query.toLowerCase() + "%";
         return jdbi.withHandle(handle -> handle.createQuery(
-                "SELECT * FROM wizards WHERE LOWER(first_name) LIKE '%" + q + "%' " +
-                "OR LOWER(last_name) LIKE '%" + q + "%' " +
+                "SELECT * FROM wizards WHERE LOWER(first_name) LIKE :pattern " +
+                "OR LOWER(last_name) LIKE :pattern " +
                 "ORDER BY last_name, first_name")
+                .bind("pattern", pattern)
                 .map(mapper)
                 .list()
         );
